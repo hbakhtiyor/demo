@@ -22,7 +22,7 @@ RUN useradd headless --shell /bin/bash --create-home \
 
 RUN mkdir /data
 
-EXPOSE 8080
+EXPOSE 80
 
 ENTRYPOINT ["/usr/bin/google-chrome-unstable", \
             "--disable-gpu", \
@@ -30,7 +30,7 @@ ENTRYPOINT ["/usr/bin/google-chrome-unstable", \
             "--hide-scrollbars", \
             "--no-sandbox", \
             "--deterministic-fetch", \
-            "--js-flags='--max-old-space-size=1000'", \
+            "--js-flags='--max-old-space-size=500'", \
             "--remote-debugging-address=0.0.0.0", \
-            "--remote-debugging-port=8080", \
+            "--remote-debugging-port=80", \
             "--user-data-dir=/data"]
