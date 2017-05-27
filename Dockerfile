@@ -22,15 +22,9 @@ RUN useradd headless --shell /bin/bash --create-home \
 
 RUN mkdir /data
 
-EXPOSE 80
+# Expose is NOT supported by Heroku
+# EXPOSE 80
 
-ENTRYPOINT ["/usr/bin/google-chrome-unstable", \
-            "--disable-gpu", \
-            "--headless", \
-            "--hide-scrollbars", \
-            "--no-sandbox", \
-            "--deterministic-fetch", \
-            "--js-flags='--max-old-space-size=500'", \
-            "--remote-debugging-address=0.0.0.0", \
-            "--remote-debugging-port=80", \
-            "--user-data-dir=/data"]
+# Run the app.  CMD is required to run on Heroku
+# $PORT is set by Heroku
+CMD /usr/bin/google-chrome-unstable --disable-gpu --headless --hide-scrollbars --no-sandbox --deterministic-fetch --js-flags="--max-old-space-size=500" --remote-debugging-address=0.0.0.0 --remote-debugging-port=$PORT --user-data-dir=/data
