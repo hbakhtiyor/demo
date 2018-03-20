@@ -1,0 +1,6 @@
+{
+    "id": "myservice",
+    "port": 80,
+    "cpu": 4,
+    "memory": 5120
+}
