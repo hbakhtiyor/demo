@@ -2,6 +2,7 @@ FROM debian:stable-slim
 # https://github.com/GoogleChrome/puppeteer/blob/a052b9e7740fdc6648ca5241614d10cc29e99fc3/docs/troubleshooting.md
 # https://github.com/joelgriffith/browserless/blob/master/Dockerfile
 # https://github.com/GoogleChrome/rendertron/blob/master/Dockerfile
+# https://github.com/moonlightwork/renderer/blob/master/Dockerfile
 
 LABEL name "aichaegh1Piechahz0naeh0z"
 
@@ -10,7 +11,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -qqy \
   && apt-get -qqy install \
        dumb-init gnupg wget ca-certificates apt-transport-https \
-       fonts-noto fonts-noto-color-emoji fonts-noto-cjk-extra \
+       libfontconfig1 fonts-liberation ttf-wqy-zenhei \
   && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
 RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
@@ -27,7 +28,7 @@ RUN useradd headless --shell /bin/bash --create-home \
 
 RUN mkdir -p /data/{core,user,cache,home,crash} && chown -R headless:headless /data
 
-USER headless
+#USER headless
 
 EXPOSE 80
 
