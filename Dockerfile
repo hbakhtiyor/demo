@@ -3,6 +3,8 @@ FROM debian:stable-slim
 # https://github.com/joelgriffith/browserless/blob/master/Dockerfile
 # https://github.com/GoogleChrome/rendertron/blob/master/Dockerfile
 # https://github.com/moonlightwork/renderer/blob/master/Dockerfile
+# https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker
+# https://peter.sh/experiments/chromium-command-line-switches/
 
 LABEL name "aichaegh1Piechahz0naeh0z"
 
@@ -12,6 +14,7 @@ RUN apt-get update -qqy \
   && apt-get -qqy install \
        dumb-init gnupg wget ca-certificates apt-transport-https \
        libfontconfig1 fonts-liberation ttf-wqy-zenhei \
+       fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
   && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
 RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
@@ -63,3 +66,15 @@ ENTRYPOINT ["/usr/bin/dumb-init", "--", \
             # "--enable-logging", \
             # "--log-level=0", \
             # "--v=99", \
+
+  # "--host=", \
+	# --disable-background-networking \
+	# --disable-default-apps \
+	# --disable-extensions \
+	# --disable-sync \
+	# --disable-translate \
+	# --metrics-recording-only \
+	# --mute-audio \
+	# --no-first-run \
+	# --safebrowsing-disable-auto-update \
+	# --ignore-ssl-errors \
