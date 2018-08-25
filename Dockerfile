@@ -10,9 +10,15 @@ LABEL name "aichaegh1Piechahz0naeh0z"
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+# Add Tini
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/bin/tini
+
+RUN chmod +x /usr/bin/tini
+
 RUN apt-get update -qqy \
   && apt-get -qqy install \
-       dumb-init gnupg wget ca-certificates apt-transport-https \
+       gnupg wget ca-certificates apt-transport-https \
        libfontconfig1 fonts-liberation ttf-wqy-zenhei \
        fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
   && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
@@ -35,7 +41,7 @@ RUN mkdir -p /data/{core,user,cache,home,crash} && chown -R headless:headless /d
 
 EXPOSE 80
 
-ENTRYPOINT ["/usr/bin/dumb-init", "--", \
+ENTRYPOINT ["/usr/bin/tini", "--", \
             "/usr/bin/google-chrome-stable", \
             "--disable-dev-shm-usage", \
             "--headless", \
