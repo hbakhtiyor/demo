@@ -21,6 +21,7 @@ RUN apt-get update -qqy \
        gnupg wget ca-certificates apt-transport-https unzip \
        libfontconfig1 fonts-liberation ttf-wqy-zenhei \
        fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
+       --no-install-recommends \
   && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
 ENV CHROME_DIR /opt/google/
@@ -36,12 +37,12 @@ RUN wget -q -O chrome-linux.zip https://storage.googleapis.com/chromium-browser-
   && unzip -qq chrome-linux.zip -d $CHROME_DIR \
   && rm chrome-linux.zip
 
-# RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
-#   && echo "deb https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
-#   && apt-get update -qqy \
-#   && apt-get -qqy install google-chrome-stable \
-#   && rm /etc/apt/sources.list.d/google-chrome.list \
-#   && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
+  && echo "deb https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+  && apt-get update -qqy \
+  && apt-get -qqy install google-chrome-unstable --no-install-recommends \
+  && rm /etc/apt/sources.list.d/google-chrome.list \
+  && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
 RUN useradd headless --shell /bin/bash --create-home \
   && usermod -a -G sudo headless \
@@ -61,7 +62,7 @@ EXPOSE 80
 # https://omahaproxy.appspot.com/
 
 ENTRYPOINT ["/usr/bin/tini", "--", \
-            $CHROME_PATH, \
+            "/opt/google/chrome-linux/chrome", \
             "--disable-dev-shm-usage", \
             "--disable-background-networking", \
             "--disable-background-timer-throttling", \
@@ -115,3 +116,6 @@ ENTRYPOINT ["/usr/bin/tini", "--", \
             # "--no-first-run", \
             # "--ignore-ssl-errors", \
             # https://groups.google.com/a/chromium.org/forum/#!topic/devtools-reviews/wnCpqPbWqiU
+
+# Run your program under Tini
+# CMD ["/your/program", "-and", "-its", "arguments"]
