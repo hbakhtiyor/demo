@@ -23,12 +23,25 @@ RUN apt-get update -qqy \
        fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
   && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
-RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
-  && echo "deb https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
-  && apt-get update -qqy \
-  && apt-get -qqy install google-chrome-stable \
-  && rm /etc/apt/sources.list.d/google-chrome.list \
-  && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+ENV CHROME_DIR /opt/google/
+ENV CHROME_REVISION 529187
+# "/usr/bin/google-chrome-unstable"
+ENV CHROME_PATH /opt/google/chrome-linux/chrome
+
+# https://www.googleapis.com/download/storage/v1/b/chromium-browser-snapshots/o/Linux_x64%2F529187%2Fchrome-linux.zip?generation=1515975355063695&alt=media
+# https://github.com/GoogleChrome/puppeteer/blob/b8e0d626f37c6c5e676b144d2b39ee29259d0d8a/lib/BrowserFetcher.js
+
+RUN wget -q -O chrome-linux.zip https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/${CHROME_REVISION}/chrome-linux.zip \
+  && mkdir -p ${CHROME_DIR} \
+  && unzip -qq chrome-linux.zip -d ${CHROME_DIR} \
+  && rm chrome-linux.zip
+
+# RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
+#   && echo "deb https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+#   && apt-get update -qqy \
+#   && apt-get -qqy install google-chrome-stable \
+#   && rm /etc/apt/sources.list.d/google-chrome.list \
+#   && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
 RUN useradd headless --shell /bin/bash --create-home \
   && usermod -a -G sudo headless \
@@ -41,9 +54,34 @@ RUN mkdir -p /data/{core,user,cache,home,crash} && chown -R headless:headless /d
 
 EXPOSE 80
 
+# 65.0.3322.3
+# https://commondatastorage.googleapis.com/chromium-browser-snapshots/index.html?prefix=Linux_x64/529187/
+# https://www.chromium.org/getting-involved/download-chromium
+# https://chromium-review.googlesource.com/c/chromium/src/+/952522
+# https://omahaproxy.appspot.com/
+
 ENTRYPOINT ["/usr/bin/tini", "--", \
-            "/usr/bin/google-chrome-stable", \
+            ${CHROME_PATH}, \
             "--disable-dev-shm-usage", \
+            "--disable-background-networking", \
+            "--disable-background-timer-throttling", \
+            "--disable-breakpad", \
+            "--disable-client-side-phishing-detection", \
+            "--disable-default-apps", \
+            "--disable-extensions", \
+            # TODO: Support OOOPIF. @see https://github.com/GoogleChrome/puppeteer/issues/2548
+            "--disable-features=site-per-process", \
+            "--disable-hang-monitor", \
+            "--disable-popup-blocking", \
+            "--disable-prompt-on-repost", \
+            "--disable-sync", \
+            "--disable-translate", \
+            "--metrics-recording-only", \
+            "--safebrowsing-disable-auto-update", \
+            "--enable-automation", \
+            "--password-store=basic", \
+            "--use-mock-keychain", \
+            "--mute-audio", \
             "--headless", \
             "--hide-scrollbars", \
             "--no-sandbox", \
@@ -73,14 +111,7 @@ ENTRYPOINT ["/usr/bin/tini", "--", \
             # "--log-level=0", \
             # "--v=99", \
 
-  # "--host=", \
-	# --disable-background-networking \
-	# --disable-default-apps \
-	# --disable-extensions \
-	# --disable-sync \
-	# --disable-translate \
-	# --metrics-recording-only \
-	# --mute-audio \
-	# --no-first-run \
-	# --safebrowsing-disable-auto-update \
-	# --ignore-ssl-errors \
+            # "--host=", \
+            # "--no-first-run", \
+            # "--ignore-ssl-errors", \
+            # https://groups.google.com/a/chromium.org/forum/#!topic/devtools-reviews/wnCpqPbWqiU
