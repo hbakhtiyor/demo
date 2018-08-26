@@ -12,13 +12,13 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # Add Tini
 ENV TINI_VERSION v0.18.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/bin/tini
+ADD https://github.com/krallin/tini/releases/download/$TINI_VERSION/tini /usr/bin/tini
 
 RUN chmod +x /usr/bin/tini
 
 RUN apt-get update -qqy \
   && apt-get -qqy install \
-       gnupg wget ca-certificates apt-transport-https \
+       gnupg wget ca-certificates apt-transport-https unzip \
        libfontconfig1 fonts-liberation ttf-wqy-zenhei \
        fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
   && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
@@ -31,9 +31,9 @@ ENV CHROME_PATH /opt/google/chrome-linux/chrome
 # https://www.googleapis.com/download/storage/v1/b/chromium-browser-snapshots/o/Linux_x64%2F529187%2Fchrome-linux.zip?generation=1515975355063695&alt=media
 # https://github.com/GoogleChrome/puppeteer/blob/b8e0d626f37c6c5e676b144d2b39ee29259d0d8a/lib/BrowserFetcher.js
 
-RUN wget -q -O chrome-linux.zip https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/${CHROME_REVISION}/chrome-linux.zip \
-  && mkdir -p ${CHROME_DIR} \
-  && unzip -qq chrome-linux.zip -d ${CHROME_DIR} \
+RUN wget -q -O chrome-linux.zip https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/$CHROME_REVISION/chrome-linux.zip \
+  && mkdir -p $CHROME_DIR \
+  && unzip -qq chrome-linux.zip -d $CHROME_DIR \
   && rm chrome-linux.zip
 
 # RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
@@ -61,7 +61,7 @@ EXPOSE 80
 # https://omahaproxy.appspot.com/
 
 ENTRYPOINT ["/usr/bin/tini", "--", \
-            ${CHROME_PATH}, \
+            $CHROME_PATH, \
             "--disable-dev-shm-usage", \
             "--disable-background-networking", \
             "--disable-background-timer-throttling", \
