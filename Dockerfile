@@ -1,4 +1,5 @@
 FROM debian:stable-slim
+# @todo use headless-shell and alpine image
 # https://github.com/GoogleChrome/puppeteer/blob/a052b9e7740fdc6648ca5241614d10cc29e99fc3/docs/troubleshooting.md
 # https://github.com/joelgriffith/browserless/blob/master/Dockerfile
 # https://github.com/GoogleChrome/rendertron/blob/master/Dockerfile
