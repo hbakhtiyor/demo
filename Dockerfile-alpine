@@ -30,10 +30,8 @@ RUN apk update && apk upgrade \
     /usr/share/man \
     /tmp/*
 
-RUN useradd headless --shell /bin/bash --create-home \
-  && usermod -a -G sudo headless \
-  && echo 'ALL ALL = (ALL) NOPASSWD: ALL' >> /etc/sudoers \
-  && echo 'headless:nopassword' | chpasswd
+
+RUN addgroup -S headless && adduser -D -S -G headless headless -s /bin/bash
 
 RUN mkdir -p /data/{core,user,cache,home,crash} && chown -R headless:headless /data
 
