@@ -1,0 +1,77 @@
+FROM alpine:latest
+
+LABEL name "uch0ui4zie2we8deisheiKae6aN3up3O"
+
+
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/$TINI_VERSION/tini /usr/bin/tini
+
+RUN chmod +x /usr/bin/tini
+
+RUN apk update && apk upgrade \
+    && apk add --no-cache \
+    wget ca-certificates unzip
+    
+
+
+RUN wget -q -O chrome-linux.zip https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/529187/chrome-linux.zip \
+  && mkdir -p /opt/google/ \
+  && unzip -qq chrome-linux.zip -d /opt/google/ \
+  && rm chrome-linux.zip
+
+RUN apk update && apk upgrade \
+    && echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories \
+    && echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories \
+    && apk add --no-cache \
+    chromium@edge \
+    nss@edge \
+    && rm -rf /var/lib/apt/lists/* \
+    /var/cache/apk/* \
+    /usr/share/man \
+    /tmp/*
+
+RUN useradd headless --shell /bin/bash --create-home \
+  && usermod -a -G sudo headless \
+  && echo 'ALL ALL = (ALL) NOPASSWD: ALL' >> /etc/sudoers \
+  && echo 'headless:nopassword' | chpasswd
+
+RUN mkdir -p /data/{core,user,cache,home,crash} && chown -R headless:headless /data
+
+
+EXPOSE 80
+
+ENTRYPOINT ["/usr/bin/tini", "--", \
+            "/opt/google/chrome-linux/chrome", \
+            "--disable-dev-shm-usage", \
+            "--disable-background-networking", \
+            "--disable-background-timer-throttling", \
+            "--disable-breakpad", \
+            "--disable-client-side-phishing-detection", \
+            "--disable-default-apps", \
+            "--disable-extensions", \
+            "--disable-features=site-per-process", \
+            "--disable-hang-monitor", \
+            "--disable-popup-blocking", \
+            "--disable-prompt-on-repost", \
+            "--disable-sync", \
+            "--disable-translate", \
+            "--metrics-recording-only", \
+            "--safebrowsing-disable-auto-update", \
+            "--enable-automation", \
+            "--password-store=basic", \
+            "--use-mock-keychain", \
+            "--mute-audio", \
+            "--headless", \
+            "--hide-scrollbars", \
+            "--no-sandbox", \
+            "--disable-setuid-sandbox", \
+            "--disable-web-security", \
+            "--remote-debugging-address=0.0.0.0", \
+            "--remote-debugging-port=80", \
+            "--ignore-certificate-errors", \
+            "--ignore-certificate-errors-spki-list", \
+            "--data-path=/data/core", \
+            "--homedir=/data/home", \
+            "--disk-cache-dir=/data/cache", \
+            "--crash-dumps-dir=/data/crash", \
+            "--user-data-dir=/data/user"]
